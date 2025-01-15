@@ -1,6 +1,6 @@
-export interface IJWT {
-    id: string,
-    name: string,
-    email: string,
-    role: string,
+import { IUser } from '../../user/user.dto';
+
+export interface IJWT extends Omit<IUser, "password"> {
+    // You can also add other JWT-specific fields if needed
+    id: string;
 }

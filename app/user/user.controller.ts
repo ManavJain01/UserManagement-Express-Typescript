@@ -3,6 +3,7 @@ import * as userService from "./user.service";
 import { createResponse } from "../common/helper/response.hepler";
 import asyncHandler from "express-async-handler";
 import { type Request, type Response } from 'express'
+import createHttpError from "http-errors";
 
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
     const result = await userService.createUser(req.body);
@@ -15,7 +16,13 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const editUser = asyncHandler(async (req: Request, res: Response) => {
-    const result = await userService.editUser(req.params.id, req.body);
+    if(!req.user){
+        throw createHttpError(403, {
+            message: "Invalid or unauthorized user role",
+        });
+    }
+
+    const result = await userService.editUser(req.user._id, req.body);
     res.send(createResponse(result, "User updated sucssefully"))
 });
 

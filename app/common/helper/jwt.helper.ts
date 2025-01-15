@@ -12,12 +12,12 @@ const getEnvTokens = () => {
     return { REFRESH_TOKEN, ACCESS_TOKEN };
 }
 
-export const generateAccessTokenAndRefreshToken = async (user : IUser) => {
+export const generateAccessTokenAndRefreshToken = async (user : IUser, access: string = '1h') => {
     const { REFRESH_TOKEN, ACCESS_TOKEN } = getEnvTokens();
     console.log("in jwt helper: ", ACCESS_TOKEN);
     
     const payload = {
-        id: user._id,
+        _id: user._id,
         role: user.role,
     }
     
@@ -25,7 +25,7 @@ export const generateAccessTokenAndRefreshToken = async (user : IUser) => {
         payload,
         ACCESS_TOKEN,
         {
-            expiresIn: "1h", // Access Token expiration time
+            expiresIn: `${access === '1h' ? '1h' : '30d'}`, // Access Token expiration time
         }
     );
 
@@ -46,7 +46,7 @@ export const decodeAccessToken = async (encryptedAccessToken : string) => {
     // Verify token and attach the user information to the request object
     const payload = jwt.verify(encryptedAccessToken, ACCESS_TOKEN);
 
-    if (typeof payload !== "object" || payload === null || !payload.email || !payload.id || !payload.name || !payload.role) {
+    if (typeof payload !== "object" || payload === null || !payload._id || !payload.role) {
         throw createHttpError(403, {
         message: "Invalid Token",
         });
